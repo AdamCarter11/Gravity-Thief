@@ -71,7 +71,6 @@ public class Player : MonoBehaviour
         JumpInputs();
 
         GravityFunc();
-        
     }
 
     void FixedUpdate() 
@@ -109,18 +108,20 @@ public class Player : MonoBehaviour
         if(isGrounded){
             if(!hitTheGround){
                 hitTheGround = true;
-                if(Mathf.Abs(rb.velocity.y) > 10){
+                if(Mathf.Abs(rb.velocity.y) > 5){
                     //cam.GetComponent<ScreenShake>().TriggerShake();
-                    print(Mathf.Abs(rb.velocity.y));
-                    print("test");
+                    //print(Mathf.Abs(rb.velocity.y));
+                    //print("test");
                     CinaShake.Instance.ShakeCamera(5f, .1f);
                 }
             }
+            
             amountOfJumps = resetJumps;
             speed = resetSpeed;
 
             if(!reverseGravity){
                 gravityTime = resetGravTime;
+                
             }
         }
         else if(speed >= 10){
