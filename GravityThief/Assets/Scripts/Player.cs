@@ -13,6 +13,7 @@ public class Player : MonoBehaviour
     private float resetSpeed;
     private Rigidbody2D rb;
     private bool dir = true;
+    private Vector3 checkpoint;
 
     //timer vars
     [Header("Timer Variables")]
@@ -49,6 +50,7 @@ public class Player : MonoBehaviour
         resetSpeed = speed;
         resetGravTime = gravityTime;
         money = 0;
+        checkpoint = new Vector3(-4.0f, -3.5f, transform.position.z);
 
         if(!PlayerPrefs.HasKey("Time")){
             PlayerPrefs.SetInt("Time", 0);
@@ -66,6 +68,11 @@ public class Player : MonoBehaviour
         }
         if(dir && moveVec < 0){
             Flip();
+        }
+
+        if(transform.position.y <= -6){
+            //died
+            transform.position = checkpoint;
         }
 
         TimerFunc();
@@ -103,6 +110,17 @@ public class Player : MonoBehaviour
                 PlayerPrefs.SetInt("Time", (int)totalTime);
             }
             SceneManager.LoadScene("EndScene");
+        }
+
+        if(other.gameObject.CompareTag("CheckPoint")){
+            checkpoint = new Vector3(other.gameObject.transform.position.x, other.gameObject.transform.position.y, checkpoint.z);
+        }
+        
+        if(other.gameObject.CompareTag("Spike")){
+            if(reverseGravity){
+                resetGravity();
+            }
+            transform.position = checkpoint;
         }
     }
 

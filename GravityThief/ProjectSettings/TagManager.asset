@@ -8,6 +8,8 @@ TagManager:
   - HiddenWall
   - Money
   - End
+  - CheckPoint
+  - Spike
   layers:
   - Default
   - TransparentFX
