@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour
 {
@@ -16,6 +17,8 @@ public class Player : MonoBehaviour
     //timer vars
     [Header("Timer Variables")]
     [SerializeField] TMP_Text timerText;
+    [SerializeField] TMP_Text moneyText;
+    private int money;
     private float totalTime = 0.0f;
     private bool startTimer = false;
 
@@ -45,18 +48,17 @@ public class Player : MonoBehaviour
         resetJumps = amountOfJumps;
         resetSpeed = speed;
         resetGravTime = gravityTime;
+        money = 0;
+
+        if(!PlayerPrefs.HasKey("Time")){
+            PlayerPrefs.SetInt("Time", 0);
+            PlayerPrefs.SetInt("Money", 0);
+        }
     }
 
     void Update()
     {
-        //print(Mathf.Abs(rb.velocity.y));
-        if(Input.anyKey){
-            startTimer = true;
-        }
-        if(startTimer){
-            totalTime += Time.deltaTime;
-            timerText.text = Mathf.RoundToInt(totalTime).ToString();
-        }
+        UIFuncs();
 
         moveVec = Input.GetAxis("Horizontal");
         if(dir == false && moveVec > 0){
@@ -76,6 +78,51 @@ public class Player : MonoBehaviour
     void FixedUpdate() 
     {
         rb.velocity = new Vector2(moveVec * speed, rb.velocity.y);
+    }
+
+    private void OnTriggerEnter2D(Collider2D other) {
+        if(other.gameObject.CompareTag("GravPickUp")){
+            gravityTime = resetGravTime;
+            Destroy(other.gameObject);
+        }
+
+        if(other.gameObject.CompareTag("HiddenWall")){
+            Color tempAlpha = other.GetComponent<SpriteRenderer>().color;
+            tempAlpha.a = .5f;
+            other.GetComponent<SpriteRenderer>().color = tempAlpha;
+        }
+
+        if(other.gameObject.CompareTag("Money")){
+            money++;
+            Destroy(other.gameObject);
+        }
+
+        if(other.gameObject.CompareTag("End")){
+            if(PlayerPrefs.GetInt("Time") == 0 || money > PlayerPrefs.GetInt("Money") || totalTime < PlayerPrefs.GetInt("Time") && money >= PlayerPrefs.GetInt("Money")){
+                PlayerPrefs.SetInt("Money", money);
+                PlayerPrefs.SetInt("Time", (int)totalTime);
+            }
+            SceneManager.LoadScene("EndScene");
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other) {
+        if(other.gameObject.CompareTag("HiddenWall")){
+            Color tempAlpha = other.GetComponent<SpriteRenderer>().color;
+            tempAlpha.a = 255;
+            other.GetComponent<SpriteRenderer>().color = tempAlpha;
+        }
+    }
+
+    void UIFuncs(){
+        if(Input.anyKey){
+            startTimer = true;
+        }
+        if(startTimer){
+            totalTime += Time.deltaTime;
+            timerText.text = "Time: " + (Mathf.RoundToInt(totalTime).ToString());
+        }
+        moneyText.text = "Money: " + money;
     }
 
     void Flip(){
@@ -109,9 +156,6 @@ public class Player : MonoBehaviour
             if(!hitTheGround){
                 hitTheGround = true;
                 if(Mathf.Abs(rb.velocity.y) > 5){
-                    //cam.GetComponent<ScreenShake>().TriggerShake();
-                    //print(Mathf.Abs(rb.velocity.y));
-                    //print("test");
                     CinaShake.Instance.ShakeCamera(5f, .1f);
                 }
             }
