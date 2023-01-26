@@ -90,6 +90,7 @@ public class Player : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other) {
         if(other.gameObject.CompareTag("GravPickUp")){
             gravityTime = resetGravTime;
+            gravityIndicator.fillAmount = gravityTime/2;
             Destroy(other.gameObject);
         }
 
@@ -185,12 +186,20 @@ public class Player : MonoBehaviour
                 gravityTime = resetGravTime;
                 
             }
+            else{
+                gravityTimeIsRunning = false;
+            }
         }
         else if(speed >= 10){
             speed /= 2;
         }
         if(Input.GetKeyDown(KeyCode.Space) && amountOfJumps > 0){
-            rb.velocity = Vector2.up * jumpForce;
+            if(reverseGravity){
+                rb.velocity = Vector2.down * jumpForce;
+            }else{
+                rb.velocity = Vector2.up * jumpForce;
+            }
+            
             amountOfJumps--;
         }
     }
