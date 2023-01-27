@@ -10,6 +10,7 @@ TagManager:
   - End
   - CheckPoint
   - Spike
+  - Death
   layers:
   - Default
   - TransparentFX

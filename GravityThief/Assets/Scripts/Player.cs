@@ -50,7 +50,7 @@ public class Player : MonoBehaviour
         resetSpeed = speed;
         resetGravTime = gravityTime;
         money = 0;
-        checkpoint = new Vector3(-4.0f, -3.5f, transform.position.z);
+        checkpoint = transform.position;
 
         if(!PlayerPrefs.HasKey("Time")){
             PlayerPrefs.SetInt("Time", 0);
@@ -90,7 +90,7 @@ public class Player : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other) {
         if(other.gameObject.CompareTag("GravPickUp")){
             gravityTime = resetGravTime;
-            gravityIndicator.fillAmount = gravityTime/2;
+            gravityIndicator.fillAmount = gravityTime;
             Destroy(other.gameObject);
         }
 
@@ -117,7 +117,7 @@ public class Player : MonoBehaviour
             checkpoint = new Vector3(other.gameObject.transform.position.x, other.gameObject.transform.position.y, checkpoint.z);
         }
         
-        if(other.gameObject.CompareTag("Spike")){
+        if(other.gameObject.CompareTag("Spike") || other.gameObject.CompareTag("Death")){
             if(reverseGravity){
                 resetGravity();
             }
@@ -156,7 +156,7 @@ public class Player : MonoBehaviour
             if(gravityTime > 0){
                 gravityTime -= Time.deltaTime;
                 gravityIndicator.enabled = true;
-                gravityIndicator.fillAmount = gravityTime/2;
+                gravityIndicator.fillAmount = gravityTime;
             }
             else{
                 resetGravity();
@@ -174,7 +174,7 @@ public class Player : MonoBehaviour
         if(isGrounded){
             if(!hitTheGround){
                 hitTheGround = true;
-                if(Mathf.Abs(rb.velocity.y) > 5){
+                if(Mathf.Abs(rb.velocity.y) > 8){
                     CinaShake.Instance.ShakeCamera(5f, .1f);
                 }
             }
@@ -195,9 +195,18 @@ public class Player : MonoBehaviour
         }
         if(Input.GetKeyDown(KeyCode.Space) && amountOfJumps > 0){
             if(reverseGravity){
-                rb.velocity = Vector2.down * jumpForce;
+                rb.velocity = Vector2.down * jumpForce * Time.deltaTime;
             }else{
-                rb.velocity = Vector2.up * jumpForce;
+                rb.velocity = Vector2.up * jumpForce * Time.deltaTime;
+            }
+            
+            amountOfJumps--;
+        }
+        else if(Input.GetKeyDown(KeyCode.Space) && amountOfJumps == 0){
+            if(reverseGravity){
+                rb.velocity = Vector2.down * jumpForce * Time.deltaTime;
+            }else{
+                rb.velocity = Vector2.up * jumpForce * Time.deltaTime;
             }
             
             amountOfJumps--;
@@ -215,7 +224,7 @@ public class Player : MonoBehaviour
             Vector3 scaler = transform.localScale;
             scaler.y *= -1;
             transform.localScale = scaler;
-            rb.gravityScale = -1;
+            rb.gravityScale = -2;
         }
         else if(Input.GetMouseButtonDown(0) && reverseGravity){
             resetGravity();
@@ -228,6 +237,6 @@ public class Player : MonoBehaviour
         Vector3 scaler = transform.localScale;
         scaler.y = Mathf.Abs(scaler.y);
         transform.localScale = scaler;
-        rb.gravityScale = 1;
+        rb.gravityScale = 2;
     }
 }
