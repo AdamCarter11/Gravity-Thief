@@ -173,7 +173,11 @@ public class Player : MonoBehaviour
             }
         }
     }
-
+    IEnumerator landSlow(){
+        speed /= 2;
+        yield return new WaitForSeconds(.2f);
+        speed *= 2;
+    }
     void JumpInputs(){
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, whatIsGround);
 
@@ -183,13 +187,16 @@ public class Player : MonoBehaviour
         if(isGrounded){
             if(!hitTheGround){
                 hitTheGround = true;
+                speed = resetSpeed;
+                rb.velocity = Vector2.zero;
+                StartCoroutine(landSlow());
                 if(Mathf.Abs(rb.velocity.y) > 8){
                     CinaShake.Instance.ShakeCamera(5f, .1f);
                 }
             }
             
             amountOfJumps = resetJumps;
-            speed = resetSpeed;
+            
 
             if(!reverseGravity){
                 gravityTime = resetGravTime;
@@ -204,18 +211,18 @@ public class Player : MonoBehaviour
         }
         if(Input.GetKeyDown(KeyCode.Space) && amountOfJumps > 0){
             if(reverseGravity){
-                rb.velocity = Vector2.down * jumpForce * Time.deltaTime;
+                rb.velocity = Vector2.down * jumpForce;
             }else{
-                rb.velocity = Vector2.up * jumpForce * Time.deltaTime;
+                rb.velocity = Vector2.up * jumpForce;
             }
             
             amountOfJumps--;
         }
         else if(Input.GetKeyDown(KeyCode.Space) && amountOfJumps == 0){
             if(reverseGravity){
-                rb.velocity = Vector2.down * jumpForce * Time.deltaTime;
+                rb.velocity = Vector2.down * jumpForce;
             }else{
-                rb.velocity = Vector2.up * jumpForce * Time.deltaTime;
+                rb.velocity = Vector2.up * jumpForce;
             }
             
             amountOfJumps--;
