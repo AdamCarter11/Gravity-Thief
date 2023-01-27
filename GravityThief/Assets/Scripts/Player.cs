@@ -42,6 +42,7 @@ public class Player : MonoBehaviour
     float resetGravTime;
     bool reverseGravity = false;
     bool gravityTimeIsRunning = false;
+    GameObject[] gravPickUps;
 
     void Start()
     {
@@ -51,6 +52,7 @@ public class Player : MonoBehaviour
         resetGravTime = gravityTime;
         money = 0;
         checkpoint = transform.position;
+        gravPickUps = GameObject.FindGameObjectsWithTag("GravPickUp");
 
         if(!PlayerPrefs.HasKey("Time")){
             PlayerPrefs.SetInt("Time", 0);
@@ -91,7 +93,7 @@ public class Player : MonoBehaviour
         if(other.gameObject.CompareTag("GravPickUp")){
             gravityTime = resetGravTime;
             gravityIndicator.fillAmount = gravityTime;
-            Destroy(other.gameObject);
+            other.gameObject.SetActive(false);
         }
 
         if(other.gameObject.CompareTag("HiddenWall")){
@@ -118,10 +120,17 @@ public class Player : MonoBehaviour
         }
         
         if(other.gameObject.CompareTag("Spike") || other.gameObject.CompareTag("Death")){
-            if(reverseGravity){
+            respawn();
+        }
+    }
+
+    void respawn(){
+        if(reverseGravity){
                 resetGravity();
-            }
-            transform.position = checkpoint;
+        }
+        transform.position = checkpoint;
+        foreach(GameObject pickUp in gravPickUps){
+            pickUp.SetActive(true);
         }
     }
 
