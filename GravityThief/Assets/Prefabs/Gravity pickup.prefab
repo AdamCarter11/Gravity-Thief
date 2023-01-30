@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6565491503076254410}
   - component: {fileID: 6565491503076254411}
   - component: {fileID: 6565491503076254408}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Gravity pickup
   m_TagString: GravPickUp
   m_Icon: {fileID: 0}
